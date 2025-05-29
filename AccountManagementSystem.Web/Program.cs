@@ -5,7 +5,8 @@ using Serilog.Events;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using DevSkill.Inventory.Web.Models;
-using AccountManagementSystem.Web.Data;
+using System;
+using AccountManagementSystem.Infrustructure;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -28,12 +29,16 @@ try
     });
     // Add services to the container.
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(connectionString));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString,
+        b => b.MigrationsAssembly("AccountManagementSystem.Infrustructure")));
+
 
     builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-        .AddEntityFrameworkStores<ApplicationDbContext>();
+        .AddEntityFrameworkStores<AppDbContext>();
     builder.Services.AddControllersWithViews();
 
     #region Serilog Configuration

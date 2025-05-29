@@ -22,4 +22,14 @@
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AccountManagementSystem.Application\AccountManagementSystem.Application.csproj" />
+    <ProjectReference Include="..\AccountManagementSystem.Infrustructure\AccountManagementSystem.Infrustructure.csproj" />
+    <ProjectReference Include="..\AccountManagemnetSystem.Domain\AccountManagemnetSystem.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
 </Project>
