@@ -8,5 +8,7 @@ namespace AccountManagemnetSystem.Domain
 {
     public interface IUnitofWork
     {
+        void Save();
+        Task SaveAsync();
     }
 }

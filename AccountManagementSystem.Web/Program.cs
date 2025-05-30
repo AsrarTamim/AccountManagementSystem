@@ -8,6 +8,7 @@ using System;
 using AccountManagementSystem.Infrustructure;
 using AccountManagementSystem.Web;
 using System.Reflection;
+using AccountManagementSystem.Application.Features.Accounts.Query;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -30,6 +31,15 @@ try
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     {
         containerBuilder.RegisterModule(new WebModule(connectionString, migrationAssembly?.FullName));
+    });
+    #endregion
+    #region Automapper Configuration
+    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+    #endregion
+    #region MediatR Configuration
+    builder.Services.AddMediatR(cfg => {
+        cfg.RegisterServicesFromAssembly(migrationAssembly);
+        cfg.RegisterServicesFromAssembly(typeof(GetAccountQuery).Assembly);
     });
     #endregion
     // Add services to the container.
