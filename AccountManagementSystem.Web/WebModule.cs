@@ -1,5 +1,7 @@
 ﻿using AccountManagementSystem.Infrustructure;
+using AccountManagementSystem.Infrustructure.Repositories;
 using AccountManagemnetSystem.Domain;
+using AccountManagemnetSystem.Domain.Repositories;
 using Autofac;
 
 namespace AccountManagementSystem.Web
@@ -21,9 +23,16 @@ namespace AccountManagementSystem.Web
                 .WithParameter("connectionString", _connectionString)
                 .WithParameter("migrationAssembly", _migrationAssembly)
             .InstancePerLifetimeScope();
+            builder.RegisterType<AccountRepository>()
+                   .As<IAccountRepository>()
+                   .InstancePerLifetimeScope();
 
+            builder.RegisterType<ApplicationUnitOfWork>()
+                   .As<IApplicationUnitOfWork>()
+                   .InstancePerLifetimeScope();
             builder.RegisterType<ApplicationUnitOfWork>().As<IApplicationUnitOfWork>()
                 .InstancePerLifetimeScope();
+
 
             base.Load(builder);
         }

@@ -14,12 +14,12 @@ namespace AccountManagementSystem.Infrustructure
 {
     public class ApplicationUnitOfWork : UnitOfWork, IApplicationUnitOfWork
     {
-        public IAccountRepository _accountRepository { get; private set; }
+        public IAccountRepository AccountRepository { get; private set; }
         public ApplicationUnitOfWork(AppDbContext context, IAccountRepository accountRepository) : base(context)
         {
-            _accountRepository = accountRepository;
+            AccountRepository = accountRepository;
         }
-        public async Task<(IList<Account> data, int total, int totalDisplay)> GetAccounts(int pageIndex,
+        public async Task<(IList<Account> data, int total, int totalDisplay)> GetAccountsp(int pageIndex,
            int pageSize, string order, AccountSearchDto search)
         {
             var procedureName = "GetAccounts";
@@ -30,9 +30,10 @@ namespace AccountManagementSystem.Infrustructure
                     { "PageIndex", pageIndex },
                     { "PageSize", pageSize },
                     { "OrderBy", order },
-                    { "IsActive", search.IsActive },
-                    { "AccountName", string.IsNullOrEmpty(search.Name) ? null : search.Name },
-                    { "Description", string.IsNullOrEmpty(search.AccountType) ? null : search.AccountType }
+                    { "CashFrom", search.CashFrom },
+                    { "CashTo" , search.CashTo },
+                    { "Name", string.IsNullOrEmpty(search.Name) ? null : search.Name },
+                    { "AccountType", string.IsNullOrEmpty(search.AccountType) ? null : search.AccountType }
                 },
                 new Dictionary<string, Type>
                 {

@@ -1,13 +1,16 @@
-﻿using AccountManagementSystem.Application.Features.Accounts.Query;
+﻿using AccountManagementSystem.Application.Features.Accounts.Command;
+using AccountManagementSystem.Application.Features.Accounts.Query;
 using AccountManagementSystem.Domain;
+using AccountManagementSystem.Web.Areas.Admin.Models;
 using AccountManagementSystem.Web.Areas.Admin.Models.Account;
 using AccountManagemnetSystem.Domain.Dtos;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Web;
-
+using AccountManagementSystem.Infrastructure;
 namespace AccountManagementSystem.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -21,38 +24,88 @@ namespace AccountManagementSystem.Web.Areas.Admin.Controllers
         {
             return View();
         }
+        public IActionResult Add()
+        {
+            var model = new AccountAddCommand();
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(AccountAddCommand AccountAddCommand)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _mediator.Send(AccountAddCommand);
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Account added",
+                        Type = ResponseTypes.Success
+                    });
+
+                    return RedirectToAction("Index");
+                }
+                catch (DuplicateNameException de)
+                {
+                    ModelState.AddModelError("DuplicatAccount", de.Message);
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = de.Message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to add Account");
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Failed to add Account",
+                        Type = ResponseTypes.Danger
+                    });
+                }
+            }
+            return View(AccountAddCommand);
+        }
+
         [HttpPost]
-        public async Task<JsonResult> GetAccountJsonData([FromBody] AcountListModel model)
+        public async Task<JsonResult> GetAccountJsonData([FromBody] AccountListModel model, string v)
+         
+        
         {
             try
             {
+
                 var searchDto = _mapper.Map<AccountSearchDto>(model.SearchItem);
+
                 var query = new GetAccountQuery
                 {
                     PageIndex = model.PageIndex,
                     PageSize = model.PageSize,
-                    OrderBy = model.FormatSortExpression("AccountName", "Description", "Price", "Id"),
+                    OrderBy = model.FormatSortExpression("Name", "AccountType", "Cash", "Id"),
                     Search = searchDto
                 };
-                Console.WriteLine(" Controller hit!");
-                Console.WriteLine($"OrderBy: {query.OrderBy}");
+
 
                 var (data, total, totalDisplay) = await _mediator.Send(query);
 
-                var Accounts = new
+                var result = new
                 {
                     recordsTotal = total,
                     recordsFiltered = totalDisplay,
                     data = data.Select(record => new string[]
                     {
-                HttpUtility.HtmlEncode(record.Name),
-                HttpUtility.HtmlEncode(record.AccountType),
-                record.IsActive.ToString(),
-                record.Id.ToString()
+                        HttpUtility.HtmlEncode(record.Name),
+                        HttpUtility.HtmlEncode(record.AccountType),
+                        record.Cash.ToString(),
+                        record.Id.ToString()
                     }).ToArray()
                 };
+                _logger.LogInformation("Total: {Total}, Display: {Display}, Records: {Count}", total, totalDisplay, data.Count());
 
-                return Json(Accounts);
+                return Json(result);
             }
             catch (Exception ex)
             {
@@ -60,6 +113,7 @@ namespace AccountManagementSystem.Web.Areas.Admin.Controllers
                 return Json(DataTables.EmptyResult);
             }
         }
+
     }
 }
 

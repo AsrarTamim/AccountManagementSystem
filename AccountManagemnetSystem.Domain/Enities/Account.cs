@@ -10,9 +10,9 @@ namespace AccountManagementSystem.Domain.Entities
     public class Account : IEntity<Guid>
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string? AccountType { get; set; }
-        public bool IsActive { get; set; } = true;
+        public string Name { get; set; } 
+        public string AccountType { get; set; }
+        public double Cash { get; set; }
     }
 }
 

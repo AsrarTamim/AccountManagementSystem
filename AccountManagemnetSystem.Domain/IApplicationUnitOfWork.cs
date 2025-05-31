@@ -11,8 +11,8 @@ namespace AccountManagemnetSystem.Domain
 {
     public interface IApplicationUnitOfWork : IUnitofWork
     {
-        public  IAccountRepository _accountRepository { get; }
-        Task<(IList<Account> data, int total, int totalDisplay)> GetAccounts(int pageIndex,
+        public  IAccountRepository AccountRepository { get; }
+        Task<(IList<Account> data, int total, int totalDisplay)> GetAccountsp(int pageIndex,
            int pageSize, string? order, AccountSearchDto search);
     }
 }

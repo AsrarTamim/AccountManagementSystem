@@ -21,7 +21,7 @@ namespace AccountManagementSystem.Application.Features.Accounts.Query
         public async Task<(IList<Account> data, int total, int totalDisplay)> Handle(GetAccountQuery request,
             CancellationToken cancellationToken)
         {
-            return await _unitOfWork.GetAccounts(
+            return await _unitOfWork.GetAccountsp(
                 request.PageIndex,
                 request.PageSize,
                 request.OrderBy,

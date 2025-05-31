@@ -25,7 +25,7 @@ try
     Log.Information("App is starting2");
     var builder = WebApplication.CreateBuilder(args);
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-    var migrationAssembly = Assembly.GetExecutingAssembly();
+    var migrationAssembly = typeof(AppDbContext).Assembly;
     #region
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -44,12 +44,9 @@ try
     #endregion
     // Add services to the container.
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, x =>
+        x.MigrationsAssembly("AccountManagementSystem.Infrustructure")));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-    builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString,
-        b => b.MigrationsAssembly("AccountManagementSystem.Infrustructure")));
-
 
     builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
         .AddEntityFrameworkStores<AppDbContext>();

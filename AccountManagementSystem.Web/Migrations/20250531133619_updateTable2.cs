@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace AccountManagementSystem.Infrustructure.Migrations
+namespace AccountManagementSystem.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class AcountEntitie : Migration
+    public partial class updateTable2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

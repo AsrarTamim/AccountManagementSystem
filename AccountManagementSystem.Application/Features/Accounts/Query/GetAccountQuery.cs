@@ -13,7 +13,7 @@ namespace AccountManagementSystem.Application.Features.Accounts.Query
     {
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
-        public string? OrderBy { get; set; }
+        public string OrderBy { get; set; }
         public AccountSearchDto Search { get; set; }
     }
 }

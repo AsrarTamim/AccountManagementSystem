@@ -1,18 +1,13 @@
 ﻿@using AccountManagementSystem.Web.Areas.Admin.Models.Account
-@model AcountListModel
+@model AccountListModel
 @{
-    ViewData["Title"] = "Accounts";
+    ViewData["Title"] = "Account";
 }
 
 @section Styles
 {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
-
-
 }
 
 <!--begin::App Content Header-->
@@ -21,11 +16,11 @@
     <div class="container-fluid">
         <!--begin::Row-->
         <div class="row">
-            <div class="col-sm-6"><h3 class="mb-0">Accounts</h3></div>
+            <div class="col-sm-6"><h3 class="mb-0">Account</h3></div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Accounts</li>
+                    <li class="breadcrumb-item active" aria-current="page">Account</li>
                 </ol>
             </div>
         </div>
@@ -67,8 +62,14 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label>Rating From</label>
-                                <input type="number" asp-for="SearchItem.IsActive" class="form-control" />
+                                <label>Cash From</label>
+                                <input type="number" asp-for="SearchItem.CashFrom" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label>Cash To</label>
+                                <input type="number" asp-for="SearchItem.CashTo" class="form-control" />
                             </div>
                         </div>
                     </div>
@@ -83,17 +84,17 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title">Available Accounts</h3></div>
+                    <div class="card-header"><h3 class="card-title">Available Account</h3></div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <partial name="_ResponsePartial" />
                         <partial name="_ModalPartial" />
-                        <table id="Accounts" class="table table-bordered">
+                        <table id="Account" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>AccountType</th>
-                                    <th>Price</th>
+                                    <th>Cash</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -103,7 +104,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>AccountType</th>
-                                    <th>Price</th>
+                                    <th>Cash</th>
                                     <th>Actions</th>
                                 </tr>
                             </tfoot>
@@ -128,13 +129,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-
     <script>
         $(function () {
-            $("#Accounts").DataTable({
+            $("#Account").DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -152,7 +149,7 @@
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
                 ajax: {
-                    url: "/Admin/Accounts/GetAccountJsonDataSP",
+                    url: "/Admin/Account/GetAccountJsonData",
                     type: "POST",
                     contentType: "application/json", //must be added
                     dataType: "json", //better to add, not mandatory
@@ -160,7 +157,8 @@
                                 d.SearchItem = {
                                     Name: $("#SearchItem_Name").val(),
                                     AccountType: $("#SearchItem_AccountType").val(),
-                                    IsActive: $("#SearchItem_IsActive").val() === "" ? null : $("#SearchItem_IsActive").val(),
+                                    CashFrom: $("#SearchItem_CashFrom").val() === "" ? null : $("#SearchItem_CashFrom").val(),
+                                    CashTo: $("#SearchItem_CashTo").val() === "" ? null : $("#SearchItem_CashTo").val()
                                 };
 
                         return JSON.stringify(d);
@@ -172,7 +170,7 @@
                         targets: 3,
                         render: function (data, type, row) {
                             console.log(type);
-                            return `<button type="submit" class="btn btn-info btn-sm" onclick="window.location.href='/admin/Accounts/update/${data}'" value='${data}'>
+                            return `<button type="submit" class="btn btn-info btn-sm" onclick="window.location.href='/admin/Account/update/${data}'" value='${data}'>
                                                 <i class="fas fa-pencil-alt">
                                                 </i>
                                                 Edit
@@ -187,10 +185,23 @@
                 ]
             });
 
+            $('#Account').on('click', '.show-bs-modal', function () {
+                let id = $(this).data("id");
+                let deleteModal = $("#modal-delete");
+                deleteModal.find('.modal-body p').text('Are you sure you want to delete this Account?');
+                $('#delete-id').val(id);
+                $('#delete-form').attr('action', '/admin/Account/delete');
+                deleteModal.modal('show');
+            });
+
+            $('#delete-button').click(function()
+            {
+                $('#delete-form').submit();
+            });
 
 
             $("#searchButton").click(function () {
-                $('#Accounts').DataTable().ajax.reload(null, false);
+                $('#Account').DataTable().ajax.reload(null, false);
             });
         });
     </script>
