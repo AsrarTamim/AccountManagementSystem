@@ -47,15 +47,6 @@ namespace AccountManagementSystem.Web.Areas.Admin.Controllers
 
                     return RedirectToAction("Index");
                 }
-                catch (DuplicateNameException de)
-                {
-                    ModelState.AddModelError("DuplicatAccount", de.Message);
-                    TempData.Put("ResponseMessage", new ResponseModel
-                    {
-                        Message = de.Message,
-                        Type = ResponseTypes.Danger
-                    });
-                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to add Account");
@@ -68,6 +59,71 @@ namespace AccountManagementSystem.Web.Areas.Admin.Controllers
                 }
             }
             return View(AccountAddCommand);
+        }
+        public async Task<IActionResult> Update(Guid id)
+        {
+            var command = await _mediator.Send(new GetAccountByIdQuery { Id = id });
+            var model = _mapper.Map<UpdateAccountModel>(command);
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(UpdateAccountModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var command = _mapper.Map<AccountUpdateCommand>(model);
+                    await _mediator.Send(command);
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Account updated",
+                        Type = ResponseTypes.Success
+                    });
+
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Update failed: {Message}", ex.Message);
+
+                    TempData.Put("ResponseMessage", new ResponseModel
+                    {
+                        Message = "Failed to update Account: " + ex.Message,
+                        Type = ResponseTypes.Danger
+                    });
+                }
+
+            }
+
+            return View(model);
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                _mediator.Send(new AccountDeleteCommand { Id = id });
+
+                TempData.Put("ResponseMessage", new ResponseModel
+                {
+                    Message = "Account deleted",
+                    Type = ResponseTypes.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete Account");
+
+                TempData.Put("ResponseMessage", new ResponseModel
+                {
+                    Message = "Failed to delete Account",
+                    Type = ResponseTypes.Danger
+                });
+            }
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
