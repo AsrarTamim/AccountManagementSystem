@@ -6,9 +6,12 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using System;
 using AccountManagementSystem.Infrustructure;
-using AccountManagementSystem.Web;
+using AccountManagementSystem.Web; 
 using System.Reflection;
 using AccountManagementSystem.Application.Features.Accounts.Query;
+using AccountManagementSystem.Infrustructure.Extensions;
+using AccountManagemnetSystem.Domain;
+
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -25,13 +28,22 @@ try
     Log.Information("App is starting2");
     var builder = WebApplication.CreateBuilder(args);
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-    var migrationAssembly = typeof(AppDbContext).Assembly;
-    #region
+    var migrationAssembly = Assembly.GetExecutingAssembly();
+    #region Autofac
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     {
         containerBuilder.RegisterModule(new WebModule(connectionString, migrationAssembly?.FullName));
     });
+    #endregion
+
+    #region Serilog Configuration
+    builder.Host.UseSerilog((context, lc) => lc
+        .MinimumLevel.Debug()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .Enrich.FromLogContext()
+        .ReadFrom.Configuration(builder.Configuration)
+    );
     #endregion
     #region Automapper Configuration
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -42,25 +54,26 @@ try
         cfg.RegisterServicesFromAssembly(typeof(GetAccountQuery).Assembly);
     });
     #endregion
+    #region Identity Configuration
+    builder.Services.AddIdentity();
+    #endregion
     // Add services to the container.
     builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString, x =>
-        x.MigrationsAssembly("AccountManagementSystem.Infrustructure")));
+         options.UseSqlServer(connectionString, (x) => x.MigrationsAssembly(migrationAssembly)));
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-    builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-        .AddEntityFrameworkStores<AppDbContext>();
+ 
     builder.Services.AddControllersWithViews();
 
-    #region Serilog Configuration
-    builder.Host.UseSerilog((context, lc) => lc
-        .MinimumLevel.Debug()
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-        .Enrich.FromLogContext()
-        .ReadFrom.Configuration(builder.Configuration)
-    );
-    #endregion
+    builder.Services.AddRazorPages();
 
+
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        options.LoginPath = "/Profile/Login";
+        options.AccessDeniedPath = "/Profile/AccessDenied";
+    });
+    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.

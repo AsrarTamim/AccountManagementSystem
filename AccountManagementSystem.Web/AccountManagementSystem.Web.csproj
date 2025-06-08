@@ -8,12 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Profile\**" />
+    <Content Remove="Views\Profile\**" />
+    <EmbeddedResource Remove="Views\Profile\**" />
+    <None Remove="Views\Profile\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -35,6 +43,15 @@
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Data\" />
     <Folder Include="Logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\Profile\Login.cshtml" />
+    <Content Include="Views\Profile\Register.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\Profile\AccessDenied.cshtml" />
   </ItemGroup>
 
 </Project>

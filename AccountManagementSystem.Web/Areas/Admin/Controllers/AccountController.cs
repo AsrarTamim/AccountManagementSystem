@@ -11,9 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Web;
 using AccountManagementSystem.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 namespace AccountManagementSystem.Web.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize(Roles = "Admin, HR")]
     public class AccountController(ILogger<AccountController> logger, IMapper mapper, IMediator mediator) : Controller
     {
         private readonly ILogger<AccountController> _logger = logger;
