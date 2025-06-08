@@ -22,15 +22,15 @@ namespace AccountManagementSystem.Infrustructure.Seeds
                 new ApplicationRole
                 {
                     Id = new Guid("AE59C5FD-E084-409F-AC8F-F7D5E782357E"),
-                    Name = "HR",
-                    NormalizedName = "HR",
+                    Name = "Accountant",
+                    NormalizedName = "ACCOUNTANT",
                     ConcurrencyStamp = new DateTime(2025, 4, 19, 1, 2, 3).ToString(),
                 },
                 new ApplicationRole
                 {
                     Id = new Guid("A26EFDE9-74F9-420E-B17E-D3E817681662"),
-                    Name = "Author",
-                    NormalizedName = "AUTHOR",
+                    Name = "Viewer",
+                    NormalizedName = "Viewer",
                     ConcurrencyStamp = new DateTime(2025, 4, 19, 1, 2, 4).ToString(),
                 }
             ];
