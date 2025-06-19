@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace AccountManagementSystem.Web.Areas.Admin.Controllers
 {
     [Area("Admin"), Authorize(Roles = "Admin")]
-    public class UsersController : Controller
+    public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
 
-        public UsersController(UserManager<ApplicationUser> userManager,
+        public UserController(UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore)
         {
             _userManager = userManager;
@@ -21,11 +21,12 @@ namespace AccountManagementSystem.Web.Areas.Admin.Controllers
             _emailStore = GetEmailStore();
         }
 
-        public IActionResult AddUserAsync()
+        public IActionResult AddUser()
         {
             var model = new AddUserModel();
             return View(model);
         }
+
 
         //[HttpPost, ValidateAntiForgeryToken]
         //public async Task<IActionResult> AddUserAsync(AddUserModel model)
