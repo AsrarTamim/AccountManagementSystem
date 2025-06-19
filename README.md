@@ -115,4 +115,9 @@ To enable email confirmation:
 ```
 If not configured, registration will still work, but confirmation emails won't be sent.
 
+# Userpage
+You can add user using this 
+go to this url : https://localhost:7203/Admin/User/AddUser
+![image](https://github.com/user-attachments/assets/e9d7d92d-4cb7-475d-a7b2-7ba8c4340306)
+
 
